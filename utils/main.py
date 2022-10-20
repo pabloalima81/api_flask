@@ -1,11 +1,29 @@
 import pandas as pd
+import mysql.connector
+from mysql.connector import Error
 
 def User_score(user_name):
+    db = mysql.connector.connect(
+                            host="localhost",
+                            user="mysql",
+                            password="mysql",
+                            database="risk_index"
+                            )
+    cur = db.cursor()
+    cur.execute('SELECT * FROM score')
+    df_score = pd.DataFrame(cur.fetchall())
+    df_score.columns=['score_id', 'role_name','app_id','score']
+    cur.execute('SELECT * FROM functions')
+    df_functions = pd.DataFrame(cur.fetchall())
+    df_functions.columns=['role_id', 'role_name','username']
+    cur.execute('SELECT * FROM applications')
+    df_applications = pd.DataFrame(cur.fetchall())
+    df_applications.columns=['app_id', 'app_name','role_id','is_critical']
 
-    #Upload files
-    function = pd.read_csv (r'utils/functions.csv')
-    application = pd.read_csv (r'utils/applications.csv')
-    index = pd.read_csv (r'utils/index.csv')
+    #Data upload
+    function = df_functions #pd.read_csv (r'utils/functions.csv')
+    application = df_applications #pd.read_csv (r'utils/applications.csv')
+    index = df_score #pd.read_csv (r'utils/index.csv')
 
     role_name = function.loc[function.username == user_name,'role_name']
     role_id = function.loc[function.username == user_name,'role_id']
@@ -15,8 +33,18 @@ def User_score(user_name):
     return (score.iloc[0])
 
 def Department_score(department_code):
+    db = mysql.connector.connect(
+                            host="localhost",
+                            user="mysql",
+                            password="mysql",
+                            database="risk_index"
+                            )
+    cur = db.cursor()
+    cur.execute('SELECT * FROM employees')
+    df_employees = pd.DataFrame(cur.fetchall())
+    df_employees.columns=['id', 'full_name','div_cod','division','status','country_id','country','department_code','department','date_in','date_out','username','email']
 
-    employees = pd.read_csv(r'utils/employees.csv')
+    employees = df_employees #pd.read_csv(r'utils/employees.csv')
 
     users = employees.loc[employees.department_code==department_code,'username']
     department_score = 0
